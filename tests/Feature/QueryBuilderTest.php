@@ -186,4 +186,17 @@ class QueryBuilderTest extends TestCase
             Log::info(json_encode($item));
         });
     }
+    public function testDelete() {
+        $this->insertCategories();
+
+        DB::table("categories")->where("id", "=", "CAR")->delete();
+
+        $collection = DB::table("counters")->where("id", "=", "CAR")->get();
+
+        self::assertCount(0, $collection);
+
+        $collection->each(function($item) {
+            Log::info(json_encode($item));
+        });
+    }
 }
