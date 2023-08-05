@@ -273,4 +273,15 @@ class QueryBuilderTest extends TestCase
             Log::info("End Chunk");
         });
     }
+    public function testLazy() {
+        $this->insertManyCategories();
+
+        $collection = DB::table("categories")->orderBy("id")->lazy(10)->take(6);
+
+        self::assertNotNull($collection);
+
+        $collection->each(function($item) {
+            Log::info(json_encode($item));
+        });
+    }
 }
