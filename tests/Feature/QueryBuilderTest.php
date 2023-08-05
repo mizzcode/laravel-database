@@ -284,4 +284,38 @@ class QueryBuilderTest extends TestCase
             Log::info(json_encode($item));
         });
     }
+    public function testCursor() {
+        $this->insertManyCategories();
+
+        // cursor menggunakan PDO::fetch untuk mengambil data 1 per 1 berbeda dengan chunk atau lazy
+        $collection = DB::table("categories")->orderBy("id")->cursor();
+
+        self::assertNotNull($collection);
+
+        $collection->each(function($item) {
+            Log::info(json_encode($item));
+        });
+    }
+    public function testAggregate() {
+        $this->insertProducts();
+
+        $count = DB::table("products")->count("id");
+        self::assertEquals(2, $count);
+
+        $min = DB::table("products")->min("price");
+        self::assertEquals(1900000, $min);
+
+        $max = DB::table("products")->max("price");
+        self::assertEquals(2400000, $max);
+
+        $avg = DB::table("products")->avg("price");
+        $result = ($min + $max) / 2;
+        self::assertEquals($result, $avg);
+        Log::info("Rata-rata Harga Produk : " . $result);
+
+        $sum = DB::table("products")->sum("price");
+        $total = $min + $max;
+        self::assertEquals($total, $sum);
+        Log::info("Total Harga Produk : " . $total);
+    }
 }
