@@ -318,4 +318,16 @@ class QueryBuilderTest extends TestCase
         self::assertEquals($total, $sum);
         Log::info("Total Harga Produk : " . $total);
     }
+
+    public function testQueryBuilderRaw() {
+        $this->insertProducts();
+
+        $collection = DB::table("products")->select(
+            DB::raw("count(id) as total_product"),
+            DB::raw("min(price) as min_price"),
+            DB::raw("max(price) as max_price"),
+        )->get();
+
+        self::assertEquals(2, $collection[0]->total_product);
+    }
 }
