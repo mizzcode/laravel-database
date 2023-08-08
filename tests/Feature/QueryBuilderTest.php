@@ -366,4 +366,17 @@ class QueryBuilderTest extends TestCase
             Log::info(json_encode($item));
         });
     }
+
+    public function testLocking() {
+        $this->insertProducts();
+
+        DB::transaction(function() {
+            $collection = DB::table("products")
+            ->where("id", "=", "1")
+            ->lockForUpdate()
+            ->get();
+
+            self::assertEquals("Poco M4 Pro", $collection[0]->name);
+        });
+    }
 }
