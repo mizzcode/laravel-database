@@ -2,6 +2,9 @@
 
 namespace Tests\Feature;
 
+use Database\Seeders\CategorySeeder;
+use Database\Seeders\CounterSeeder;
+use Database\Seeders\ProductSeeder;
 use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -44,34 +47,7 @@ class QueryBuilderTest extends TestCase
     }
 
     public function insertCategories() {
-        DB::table("categories")->insert([
-            "id" => "SMARTPHONE",
-            "name" => "Poco M4 Pro",
-            "description" => "Mediatek G96 with Panel AMOLED 90Hz",
-            "created_at" => "2022-03-16"
-        ]);
-        DB::table("categories")->insert([
-            "id" => "FOOD",
-            "name" => "Whiskas",
-            "description" => "Makanan Kucing",
-            "created_at" => "2021-01-11"
-        ]);
-        DB::table("categories")->insert([
-            "id" => "LAPTOP",
-            "name" => "Thinkpad T480",
-            "description" => "intel core i5-8350u with 16gb ram",
-            "created_at" => "2023-07-05"
-        ]);
-        DB::table("categories")->insert([
-            "id" => "FASHION",
-            "name" => "Kemeja",
-            "created_at" => "2020-01-11"
-        ]);
-        DB::table("categories")->insert([
-            "id" => "CAR",
-            "name" => "When Lambo Sir",
-            "created_at" => "2023-05-15"
-        ]);
+        $this->seed(CategorySeeder::class);
     }
 
     public function testWhere() {
@@ -173,10 +149,7 @@ class QueryBuilderTest extends TestCase
         });
     }
     public function testIncrement() {
-        DB::table("counters")->insert([
-            "id" => "sample",
-            "counter" => 0
-        ]);
+        $this->seed(CounterSeeder::class);
 
         DB::table("counters")->where("id", "=", "sample")->increment("counter", 1);
 
@@ -204,18 +177,7 @@ class QueryBuilderTest extends TestCase
     public function insertProducts() {
         $this->insertCategories();
 
-        DB::table("products")->insert([
-            "id" => "1",
-            "name" => "Poco M4 Pro",
-            "category_id" => "SMARTPHONE",
-            "price" => 2400000
-        ]);
-        DB::table("products")->insert([
-            "id" => "2",
-            "name" => "Redmi Note 9",
-            "category_id" => "SMARTPHONE",
-            "price" => 1900000
-        ]);
+        $this->seed(ProductSeeder::class);
     }
     public function testJoin() {
         $this->insertProducts();
@@ -437,8 +399,8 @@ class QueryBuilderTest extends TestCase
                 Log::info(json_encode($item));
             }
 
-            $nextCursor = $paginate->nextCursor();
-            if ($nextCursor == null) {
+            $cursor = $paginate->nextCursor();
+            if ($cursor === null) {
                 break;
             }
         }
