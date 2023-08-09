@@ -379,4 +379,48 @@ class QueryBuilderTest extends TestCase
             self::assertEquals("Poco M4 Pro", $collection[0]->name);
         });
     }
+
+    public function testPagination() {
+        $this->insertCategories();
+
+        $paginate = DB::table("categories")->paginate(perPage: 2, page: 2);
+
+        self::assertEquals(2, $paginate->currentPage());
+        self::assertEquals(2, $paginate->perPage());
+        self::assertEquals(3, $paginate->lastPage());
+        self::assertEquals(5, $paginate->total());
+
+        $collection = $paginate->items();
+
+        // page 1 itu 2 item
+        self::assertCount(2, $collection);
+
+        foreach ($collection as $item) {
+            Log::info(json_encode($item));
+        }
+    }
+
+    public function testIteratePerPage() {
+        $this->insertCategories();
+
+        $page = 1;
+
+        while (true) {
+            $paginate = DB::table("categories")->paginate(perPage: 2, page: $page);
+
+            if ($paginate->isEmpty()) {
+                break;
+            } else {
+                $page++;
+
+                $collection = $paginate->items();
+
+                self::assertNotNull($collection);
+
+                foreach ($collection as $item) {
+                    Log::info(json_encode($item));
+                }
+            }
+        }
+    }
 }
